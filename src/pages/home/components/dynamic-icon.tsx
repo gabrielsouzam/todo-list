@@ -1,4 +1,4 @@
-import { iconMap } from "@/utils/iconMap";
+import { iconMap } from "@/utils/icon-map";
 import React from "react";
 
 interface DynamicIconProps {

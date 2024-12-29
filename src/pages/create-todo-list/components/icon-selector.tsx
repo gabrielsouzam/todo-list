@@ -1,4 +1,4 @@
-import { iconMap } from "@/utils/iconMap";
+import { iconMap } from "@/utils/icon-map";
 import { Box, Grid, IconButton, Text } from "@chakra-ui/react";
 
 export function IconSelector({
