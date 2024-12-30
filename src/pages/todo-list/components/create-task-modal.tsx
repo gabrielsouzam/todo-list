@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
 import {
   DialogActionTrigger,
   DialogBody,
@@ -7,26 +7,29 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle
-} from "@/components/ui/dialog";
-import { Field } from "@/components/ui/field";
-import { SegmentedControl } from "@/components/ui/segmented-control";
-import { Flex, Input } from "@chakra-ui/react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
+} from "@/components/ui/dialog"
+import { Field } from "@/components/ui/field"
+import { SegmentedControl } from "@/components/ui/segmented-control"
+import { convertToIsoFormat } from "@/utils/convert-to-iso-format"
+import { CreateTaskPayload, taskService } from "@/service/task-service"
+import { Flex, Input } from "@chakra-ui/react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useEffect, useState } from "react"
+import { Controller, useForm } from "react-hook-form"
+import { z } from "zod"
 
 interface CreateTaskModalProps {
   todoListId: string
+  onTaskCreated: () => Promise<void>
 }
 
 const priorityMap = {
   Baixa: "low",
   Média: "medium",
   Alta: "high",
-} as const;
+} as const
 
-type PriorityKey = keyof typeof priorityMap;
+type PriorityKey = keyof typeof priorityMap
 
 const createTaskSchema = z.object({
   title: z.string().min(1, { message: "O campo título é obrigatório" }).max(100),
@@ -35,30 +38,50 @@ const createTaskSchema = z.object({
   date: z.string(),
   time: z.string(),
   todoListId: z.string(),
-});
+})
 
-type CreateTaskForm = z.infer<typeof createTaskSchema>;
+export type CreateTaskForm = z.infer<typeof createTaskSchema>
 
-export function CreateTaskModal({ todoListId }: CreateTaskModalProps) {
-  const [minTime, setMinTime] = useState("");
+export function CreateTaskModal({ todoListId, onTaskCreated }: CreateTaskModalProps) {
+  const [minTime, setMinTime] = useState("")
+  const [isFormSubmitting, setFormSubmitting] = useState(false)
 
   useEffect(() => {
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, "0");
-    const minutes = String(now.getMinutes()).padStart(2, "0");
-    setMinTime(`${hours}:${minutes}`);
-  }, []);
+    const now = new Date()
+    const hours = String(now.getHours()).padStart(2, "0")
+    const minutes = String(now.getMinutes()).padStart(2, "0")
+    setMinTime(`${hours}:${minutes}`)
+  }, [])
 
   const { register, handleSubmit, formState: { errors }, reset, control } = useForm<CreateTaskForm>({
     resolver: zodResolver(createTaskSchema),
     defaultValues: {
       todoListId
     }
-  });
+  })
 
-  function onCreateTask(data: CreateTaskForm) {
-    console.log(data)
-    reset()
+  async function onCreateTask(data: CreateTaskForm) {
+    try {
+      setFormSubmitting(true)
+
+      const deadline = convertToIsoFormat(data.date, data.time)
+
+      const payload: CreateTaskPayload = {
+        title: data.title,
+        description: data.description,
+        priority: data.priority,
+        deadline,
+        todo_list_id: data.todoListId,
+      }
+
+      await taskService.create(payload)
+      reset()
+      await onTaskCreated()
+    } catch (error) {
+      console.error("Erro ao criar a task:", error)
+    } finally {
+      setFormSubmitting(false)
+    }
   }
 
   return (
@@ -144,7 +167,9 @@ export function CreateTaskModal({ todoListId }: CreateTaskModalProps) {
             <Button variant="outline">Cancelar</Button>
           </DialogActionTrigger>
           <DialogActionTrigger asChild>
-            <Button type="submit" colorPalette="blue">Criar task</Button>
+            <Button type="submit" colorPalette="blue" disabled={isFormSubmitting}>
+              Criar task
+            </Button>
           </DialogActionTrigger>
         </DialogFooter>
       </form>
@@ -152,3 +177,4 @@ export function CreateTaskModal({ todoListId }: CreateTaskModalProps) {
     </DialogContent>
   )
 }
+
