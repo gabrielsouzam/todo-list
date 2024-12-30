@@ -9,12 +9,15 @@ import { IconSelector } from "./components/icon-selector";
 import { z } from "zod";
 import { ColorPicker } from "./components/color-picker";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { todoListService } from "@/service/todo-list-service";
 
 const scopes = [
   { label: "Trabalho", value: "work" },
   { label: "Estudo", value: "study" },
   { label: "Pessoal", value: "personal" },
   { label: "Casa", value: "household" },
+  { label: "Social", value: "social" },
 ];
 
 const priorityMap = {
@@ -29,7 +32,7 @@ type PriorityKey = keyof typeof priorityMap;
 const createTodoListSchema = z.object({
   title: z.string().min(1, { message: "O campo título é obrigatório" }).max(100),
   subtitle: z.string().optional(),
-  scope: z.enum(["work", "study", "personal", "household"], { message: "Escolha um escopo para o todo list" }),
+  scope: z.enum(["work", "study", "personal", "household", "social"], { message: "Escolha um escopo para o todo list" }),
   icon: z.string().optional().default("default-icon"),
   color: z
     .string({ message: "Você deve selecionar uma cor" })
@@ -50,9 +53,11 @@ const createTodoListSchema = z.object({
   priority: z.enum(["low", "medium", "high"]).optional().default("medium"),
 });
 
-type CreateTodoListForm = z.infer<typeof createTodoListSchema>;
+export type CreateTodoListForm = z.infer<typeof createTodoListSchema>;
 
 export function CreateTodoList() {
+  const [isFormSubmitting, setFormSubmitting] = useState(false);
+
   const navigate = useNavigate();
 
   const { register, handleSubmit, formState: { errors }, control } = useForm<CreateTodoListForm>({
@@ -62,10 +67,16 @@ export function CreateTodoList() {
     }
   });
 
-  function handleCreateTodoList(data: CreateTodoListForm) {
-    console.log(data);
-
-    navigate("/")
+  async function handleCreateTodoList(data: CreateTodoListForm) {
+    try {
+      setFormSubmitting(true)
+      await todoListService.create(data) 
+      navigate("/"); 
+    } catch (error) {
+      console.error("Erro ao criar a Todo List:", error)
+    } finally {
+      setFormSubmitting(false)
+    }
   }
 
   return (
@@ -179,7 +190,7 @@ export function CreateTodoList() {
         </Flex>
 
         <Flex justify="flex-end">
-          <Button type="submit" colorPalette="blue" variant="surface">
+          <Button type="submit" colorPalette="blue" variant="surface" disabled={isFormSubmitting}>
             Criar todo list
           </Button>
         </Flex>
