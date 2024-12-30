@@ -4,9 +4,10 @@ import { TaskCard } from "./task-card";
 
 interface TaskCardsListProps {
   tasks: Task[];
+  onTaskUpdated: () => Promise<void>
 }
 
-export function TaskCardsList({ tasks }: TaskCardsListProps) {
+export function TaskCardsList({ tasks, onTaskUpdated }: TaskCardsListProps) {
   const priorities = {
     high: { label: "Prioridade alta", color: "red.500" },
     medium: { label: "Prioridade média", color: "blue.500" },
@@ -27,7 +28,11 @@ export function TaskCardsList({ tasks }: TaskCardsListProps) {
             </Text>
             <Stack spaceY="1rem">
               {filteredTasks.map((task) => (
-                <TaskCard key={task.id} task={task} />
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  onTaskUpdated={onTaskUpdated}
+                />
               ))}
             </Stack>
           </Box>
