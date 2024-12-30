@@ -1,32 +1,86 @@
-import { Button } from "@/components/ui/button";
+import { Task } from "@/@types/Task"
+import { TodoList as TodoListType } from "@/@types/TodoList"
+import { Button } from "@/components/ui/button"
 import {
   DialogRoot,
   DialogTrigger
-} from "@/components/ui/dialog";
-import { mockTasks } from "@/data/mock-tasks";
-import { mockTodoLists } from "@/data/mock-todolist";
-import { useScrollToTop } from "@/utils/use-scrool-top";
-import { Box, Flex, Text } from "@chakra-ui/react";
-import { useParams } from "react-router-dom";
-import { DynamicIcon } from "../home/components/dynamic-icon";
-import { CreateTaskModal } from "./components/create-task-modal";
-import { TaskCardsList } from "./components/tasks-cards-list";
+} from "@/components/ui/dialog"
+import {
+  ProgressCircleRing,
+  ProgressCircleRoot,
+} from "@/components/ui/progress-circle"
+import { taskService } from "@/service/task-service"
+import { todoListService } from "@/service/todo-list-service"
+import { useScrollToTop } from "@/utils/use-scrool-top"
+import { Box, Flex, Text } from "@chakra-ui/react"
+import { useEffect, useState } from "react"
+import { useParams } from "react-router-dom"
+import { DynamicIcon } from "../home/components/dynamic-icon"
+import { CreateTaskModal } from "./components/create-task-modal"
+import { TaskCardsList } from "./components/tasks-cards-list"
 
 export function TodoList() {
-  useScrollToTop();
-  
-  const { id } = useParams();
+  useScrollToTop()
 
-  const todoList = mockTodoLists.find((todoList) => todoList.id === id);
-  const task = mockTasks.find((task) => task.id === "2");
+  const { id } = useParams()
+  const [todoList, setTodoList] = useState<TodoListType>()
+  const [tasks, setTasks] = useState<Task[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
 
-  if (!todoList) {
-    return <div>Todo List não encontrada!</div>;
+  async function updateTasks() {
+    if (id) {
+      const tasks = await taskService.getByTodoList(id)
+      const todoList = await todoListService.getById(id)
+
+      setTasks(tasks)
+      setTodoList(todoList)
+    }
   }
 
-  if (!task) {
-    return <div>Todo List não encontrada!</div>;
+  useEffect(() => {
+    async function getAllTaskForTodoList() {
+      if (id !== undefined) {
+        try {
+          setLoading(true)
+          const tasks = await taskService.getByTodoList(id)
+          const todoList = await todoListService.getById(id)
+
+          setTasks(tasks)
+          setTodoList(todoList)
+          setLoading(false)
+        } catch {
+          setLoading(false)
+        }
+      }
+    }
+
+    getAllTaskForTodoList()
+  }, [id])
+
+  if (!todoList || loading) {
+    return (
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        height="100vh"
+        bg="gray.950"
+      >
+        <ProgressCircleRoot value={null} size="lg" color="blue.500">
+          <ProgressCircleRing cap="round" />
+        </ProgressCircleRoot>
+
+        <Text fontSize="xl" fontWeight="bold" color="blue.400" mt="1rem">
+          Buscando Tasks...
+        </Text>
+        <Text fontSize="md" color="gray.400">
+          Por favor, aguarde enquanto carregamos os dados.
+        </Text>
+      </Box>
+    )
   }
+
 
   return (
     <Box
@@ -53,10 +107,10 @@ export function TodoList() {
         <DialogRoot>
           <DialogTrigger asChild>
             <Button variant="outline" size="md" >
-              Criar Task
+              Criar Tarefa
             </Button>
           </DialogTrigger>
-          <CreateTaskModal todoListId={todoList.id} />
+          <CreateTaskModal todoListId={todoList.id} onTaskCreated={updateTasks} />
         </DialogRoot>
 
       </Flex >
@@ -97,8 +151,7 @@ export function TodoList() {
         </Flex >
       </Flex>
 
-      <TaskCardsList tasks={mockTasks} />
-
+      <TaskCardsList tasks={tasks} onTaskUpdated={updateTasks} />
 
     </Box>
   )
