@@ -2,7 +2,7 @@ export interface TodoList {
   id: string;
   title: string;
   subtitle: string;
-  scope: string;
+  scope: "work" | "study" | "personal" | "household" | "social";
   task_count: number;
   tasks_done: number;
   done: boolean;

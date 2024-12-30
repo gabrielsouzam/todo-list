@@ -5,8 +5,7 @@ export interface Task {
   priority: "low" | "medium" | "high"
   done: boolean
   deadline?: string
-  position: number
-  createdAt: string
-  updatedAt: string
-  todoListId: string
+  created_at: string
+  updated_at: string
+  todo_list_id: string
 }
