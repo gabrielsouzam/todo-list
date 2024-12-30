@@ -8,7 +8,7 @@ type TodoListCardsProps = {
 
 export function TodoListCards({ todoLists }: TodoListCardsProps) {
   return (
-    <VStack width="100%" as="div">
+    <VStack width="100%" as="div" mb="4rem">
       {todoLists.map((todoList) => (
         <TodoListCard
           onDelete={() => {}}

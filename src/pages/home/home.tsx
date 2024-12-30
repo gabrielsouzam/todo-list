@@ -1,16 +1,19 @@
-import { useEffect, useState } from "react";
-import { Box, Flex, Input, Text } from "@chakra-ui/react";
-import { EmptyState } from "@/components/ui/empty-state"
-import { SelectPriority } from "./components/select-priority";
 import { TodoList } from "@/@types/TodoList";
+import { ProgressCircleRing, ProgressCircleRoot } from "@/components/ui/progress-circle";
 import { todoListService } from "@/service/todo-list-service";
+import { Box, Flex, Input, Text } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import { SelectPriority } from "./components/select-priority";
 import { TodoListCards } from "./components/todo-lists-cards";
-import { MagnifyingGlass } from "@phosphor-icons/react";
 
 export function Home() {
   const [todoLists, setTodoLists] = useState<TodoList[]>([]);
+  const [filteredTodoLists, setFilteredTodoLists] = useState<TodoList[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [priorityFilter, setPriorityFilter] = useState<string>("");
 
   useEffect(() => {
     const fetchTodoLists = async () => {
@@ -18,9 +21,9 @@ export function Home() {
         setLoading(true);
         const data = await todoListService.getAll();
         setTodoLists(data.todo_lists);
+        setFilteredTodoLists(data.todo_lists); 
         setLoading(false);
-      } catch (error) {
-        console.error("Erro ao buscar TodoLists:", error);
+      } catch {
         setError("Não foi possível carregar as TodoLists.");
         setLoading(false);
       }
@@ -29,13 +32,35 @@ export function Home() {
     fetchTodoLists();
   }, []);
 
+  useEffect(() => {
+    const filtered = todoLists.filter((todoList) => {
+      const matchesPriority = priorityFilter === "" || todoList.priority === priorityFilter;
+      const matchesSearch = todoList.title.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesPriority && matchesSearch;
+    });
+    setFilteredTodoLists(filtered);
+  }, [priorityFilter, searchQuery, todoLists]);
+
   if (loading) {
     return (
-      <EmptyState
-        icon={<MagnifyingGlass />}
-        title="Buscando todo-list"
-        description="Aguarde... "
-      />
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        height="100vh"
+      >
+        <ProgressCircleRoot value={null} size="lg" color="gray.500">
+          <ProgressCircleRing cap="round" />
+        </ProgressCircleRoot>
+
+        <Text fontSize="xl" fontWeight="bold" color="blue.400" mt="1rem">
+          Buscando Todo Lists...
+        </Text>
+        <Text fontSize="md" color="gray.400">
+          Por favor, aguarde enquanto carregamos os dados.
+        </Text>
+      </Box>
     );
   }
 
@@ -65,11 +90,17 @@ export function Home() {
       </Text>
 
       <Flex gap="0.25rem" align="baseline" mb="3rem">
-        <Input placeholder="Busque por uma todo list" size="lg" height="3rem" />
-        <SelectPriority />
+        <Input
+          placeholder="Busque por uma todo list"
+          size="lg"
+          height="3rem"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <SelectPriority onSelect={(value) => setPriorityFilter(value)} />
       </Flex>
 
-      <TodoListCards todoLists={todoLists} />
+      <TodoListCards todoLists={filteredTodoLists} />
     </Box>
   );
 }
