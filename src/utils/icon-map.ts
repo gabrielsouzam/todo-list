@@ -15,7 +15,7 @@ import {
   PencilSimple,
   Wrench,
   UserCircle,
-} from "@phosphor-icons/react";
+} from "@phosphor-icons/react"
 
 export const iconMap: Record<string, React.ElementType> = {
   "study-icon": Books,
@@ -32,7 +32,6 @@ export const iconMap: Record<string, React.ElementType> = {
   "health-icon": Heart,
   "home-icon": House,
   "world-icon": Globe,
-  "write-icon": PencilSimple,
   "default-icon": PencilSimple,
   "maintenance-icon": Wrench,
   "profile-icon": UserCircle,
