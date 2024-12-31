@@ -38,7 +38,7 @@ export function DeleteTaskModal({ id, title, updateTasks }: DeleteTaskModalProps
     <DialogContent>
       <DialogHeader>
         <DialogTitle>Deseja deletar a task
-          <Text display="inline" color="red.500">{title}</Text>?
+          {" "}<Text display="inline" color="red.500">{title}</Text>?
         </DialogTitle>
       </DialogHeader>
       <DialogFooter>
