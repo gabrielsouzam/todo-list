@@ -9,7 +9,6 @@ import {
   Text
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -52,7 +51,6 @@ export function SignUp() {
 
   return (
     <>
-      <Helmet title="Cadastro" />
       <Box
         p={8}
         bg="gray.950"

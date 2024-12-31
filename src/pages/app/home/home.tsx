@@ -7,6 +7,7 @@ import { SelectPriority } from "./components/select-priority"
 import { TodoListCards } from "./components/todo-lists-cards"
 import { getUserIdFromToken } from "@/utils/get-user-id-from-token"
 import { AppHeader } from "@/pages/_layouts/components/app-header"
+import { Helmet } from "react-helmet-async"
 
 export function Home() {
   const [todoLists, setTodoLists] = useState<TodoList[]>([])
@@ -102,7 +103,7 @@ export function Home() {
 
   return (
     <>
-
+      <Helmet title="Home" />
       <AppHeader />
       <Box
         as="main"

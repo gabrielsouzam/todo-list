@@ -1,3 +1,5 @@
+import { Field } from "@/components/ui/field"
+import { authService } from "@/service/auth-service"
 import {
   Box,
   Button,
@@ -6,15 +8,12 @@ import {
   Input,
   Text
 } from "@chakra-ui/react"
-import Cookies from 'js-cookie'
-import { Field } from "@/components/ui/field"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Helmet } from "react-helmet-async"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { authService } from "@/service/auth-service"
-import { Link, useNavigate } from "react-router-dom"
+import Cookies from 'js-cookie'
 import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { Link, useNavigate } from "react-router-dom"
+import { z } from "zod"
 
 const signInFormSchema = z.object({
   email: z.string().email("Por favor, insira um e-mail válido."),
@@ -55,7 +54,6 @@ export function SignIn() {
   }
   return (
     <>
-      <Helmet title="Login" />
       <Box
         p={8}
         bg="gray.950"
