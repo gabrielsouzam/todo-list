@@ -11,4 +11,5 @@ export interface TodoList {
   priority: "low" | "medium" | "high";
   created_at: string;
   updated_at: string;
+  user_id: string;
 }

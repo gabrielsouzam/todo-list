@@ -11,6 +11,7 @@ import { ColorPicker } from "./components/color-picker";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { todoListService } from "@/service/todo-list-service";
+import { getUserIdFromToken } from "@/utils/get-user-id-from-token";
 
 const scopes = [
   { label: "Trabalho", value: "work" },
@@ -51,19 +52,27 @@ const createTodoListSchema = z.object({
       return `#${r}${g}${b}`;
     }),
   priority: z.enum(["low", "medium", "high"]).optional().default("medium"),
+  user_id: z.string()
 });
 
 export type CreateTodoListForm = z.infer<typeof createTodoListSchema>;
 
 export function CreateTodoList() {
+  const navigate = useNavigate();
+
+  let userId = getUserIdFromToken() 
+
   const [isFormSubmitting, setFormSubmitting] = useState(false);
 
-  const navigate = useNavigate();
+  if(!userId) {
+    userId = ""
+  }
 
   const { register, handleSubmit, formState: { errors }, control } = useForm<CreateTodoListForm>({
     resolver: zodResolver(createTodoListSchema),
     defaultValues: {
-      color: "rgba(255, 255, 255, 1)"
+      color: "rgba(255, 255, 255, 1)",
+      user_id: userId 
     }
   });
 
