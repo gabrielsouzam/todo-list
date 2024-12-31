@@ -1,11 +1,11 @@
-import { Task } from "@/@types/Task";
-import { formatDeadline } from "@/utils/format-deadline";
-import { Box, Flex, IconButton, Text } from "@chakra-ui/react";
-import { Pencil, Trash } from "@phosphor-icons/react";
-import { CheckButton } from "./check-button";
-import { DialogRoot, DialogTrigger } from "@/components/ui/dialog";
-import { DeleteTaskModal } from "./delete-task-modal";
-import { UpdateTaskModal } from "./update-task-modal";
+import { Task } from "@/@types/Task"
+import { formatDeadline } from "@/utils/format-deadline"
+import { Box, Flex, IconButton, Text } from "@chakra-ui/react"
+import { Pencil, Trash } from "@phosphor-icons/react"
+import { CheckButton } from "./check-button"
+import { DialogRoot, DialogTrigger } from "@/components/ui/dialog"
+import { DeleteTaskModal } from "./delete-task-modal"
+import { UpdateTaskModal } from "./update-task-modal"
 
 interface TaskCardProps {
   task: Task
@@ -53,7 +53,7 @@ export function TaskCard({ task, onTaskUpdated }: TaskCardProps) {
             <DialogTrigger asChild>
               <IconButton
                 onClick={(e) => {
-                  e.stopPropagation();
+                  e.stopPropagation()
                 }}
                 _hover={{ color: "gray.500", background: "gray.900" }}
                 size="md"
@@ -64,12 +64,12 @@ export function TaskCard({ task, onTaskUpdated }: TaskCardProps) {
             </DialogTrigger>
             <UpdateTaskModal task={task} onTaskUpdated={onTaskUpdated} />
           </DialogRoot>
-
+          
           <DialogRoot>
             <DialogTrigger asChild>
               <IconButton
                 onClick={(e) => {
-                  e.stopPropagation();
+                  e.stopPropagation()
                 }}
                 _hover={{ color: "red.500", background: "gray.900" }}
                 size="md"
