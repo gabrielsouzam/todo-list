@@ -3,6 +3,10 @@
 ## Descrição
 O **TodoList** é um aplicativo de gerenciamento de tarefas intuitivo e dinâmico. Desenvolvido com as mais modernas tecnologias de front-end, ele permite que usuários organizem, priorizem e acompanhem suas tarefas diárias com facilidade e praticidade. A interface foi projetada para oferecer uma experiência de uso fluida e responsiva, garantindo acessibilidade em diferentes dispositivos.
 
+## Ferramenta de organização
+
+- [Link para o trello](https://trello.com/b/T5HLHIam/todo-list)
+
 ## Decisões Técnicas
 - **Framework:** O projeto foi desenvolvido em **React** com suporte de bibliotecas como **Chakra UI** para componentes estilizados.
 - **Validações:** Utilizamos **React Hook Form** integrado com **Zod** para validações robustas e escaláveis nos formulários.
