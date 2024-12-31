@@ -19,7 +19,7 @@ import { DynamicIcon } from "../home/components/dynamic-icon"
 import { CreateTaskModal } from "./components/create-task-modal"
 import { TaskCardsList } from "./components/tasks-cards-list"
 
-export function TodoList() {
+export function TaskTodoList() {
   useScrollToTop()
 
   const { id } = useParams()
