@@ -2,13 +2,16 @@ import { TodoList } from "@/@types/TodoList"
 import { ProgressBar } from "@/components/ui/progress"
 import { Tag } from "@/components/ui/tag"
 import { Box, Button, Flex, ProgressRoot, Text } from "@chakra-ui/react"
+import { DialogRoot, DialogTrigger } from "@/components/ui/dialog"
 import { Trash } from "@phosphor-icons/react"
 import { useNavigate } from "react-router-dom"
 import { DynamicIcon } from "./dynamic-icon"
+import { DeleteTodoListModal } from "./delete-todo-list-modal"
+import { useState } from "react"
 
 interface TodoListCardProps {
   todoList: TodoList
-  onDelete: (id: string) => void
+  filterUndeletedTask: (id: string) => void
 }
 
 function getPriorityColor(priority: "low" | "medium" | "high") {
@@ -51,15 +54,24 @@ function getScopeText(scope: "work" | "study" | "personal" | "household" | "soci
 }
 
 
-export function TodoListCard({ todoList, onDelete }: TodoListCardProps) {
+export function TodoListCard({ todoList, filterUndeletedTask }: TodoListCardProps) {
   const navigate = useNavigate()
+  const [onDelete, setOnDelete] = useState<boolean>(false)
 
   const completedPercentage = Math.round(
     (todoList.tasks_done / (todoList.task_count || 1)) * 100
   )
 
   function navigateToTodoList(id: string) {
-    navigate(`/todo-list/${id}`)
+    if(!onDelete) {
+      navigate(`/todo-list/${id}`)
+    }
+
+    setOnDelete(false)
+  }
+
+  function UpdateTasksLists() {
+    filterUndeletedTask(todoList.id)
   }
 
   return (
@@ -111,21 +123,32 @@ export function TodoListCard({ todoList, onDelete }: TodoListCardProps) {
         </Box>
       </Box>
 
-      <Button
-        onClick={(e) => {
-          e.stopPropagation()
-          onDelete(todoList.id)
-        }}
-        _hover={{ color: "red.500" }}
-        size="sm"
-        variant="ghost"
-        colorScheme="red"
-        position="absolute"
-        top="0.5rem"
-        right="0.5rem"
-      >
-        <Trash weight="bold" />
-      </Button>
+      <DialogRoot>
+        <DialogTrigger asChild>
+          <Button
+            onClick={(e) => {
+              setOnDelete(true)
+              e.stopPropagation()
+            }}
+            _hover={{ color: "red.500" }}
+            size="sm"
+            variant="ghost"
+            colorScheme="red"
+            position="absolute"
+            top="0.5rem"
+            right="0.5rem"
+          >
+            <Trash weight="bold" />
+          </Button>
+        </DialogTrigger>
+        <DeleteTodoListModal
+          id={todoList.id}
+          title={todoList.title}
+          updateTodoLists={UpdateTasksLists}
+        />
+      </DialogRoot>
+
+
     </Flex>
   )
 }

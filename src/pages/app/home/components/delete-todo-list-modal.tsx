@@ -7,26 +7,24 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
+import { todoListService } from "@/service/todo-list-service"
 import { Text } from "@chakra-ui/react"
-import { taskService } from "@/service/task-service"
 import { useState } from "react"
 
-interface DeleteTaskModalProps {
+interface DeleteTodoListModalProps {
   id: string
   title: string
-  updateTasks: () => Promise<void>
+  updateTodoLists: () => void
 }
 
-
-
-export function DeleteTaskModal({ id, title, updateTasks }: DeleteTaskModalProps) {
+export function DeleteTodoListModal({ id, title, updateTodoLists }: DeleteTodoListModalProps) {
   const [isFormSubmitting, setFormSubmitting] = useState(false)
 
   async function handleDeleteTask() {
     try {
       setFormSubmitting(true)
-      await taskService.delete(id)
-      updateTasks()
+      await todoListService.delete(id)
+      updateTodoLists()
     } catch (error) {
       console.error(error)
     } finally {
@@ -37,9 +35,9 @@ export function DeleteTaskModal({ id, title, updateTasks }: DeleteTaskModalProps
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Deseja deletar a task
-          <Text display="inline" color="red.500">{title}</Text>?
-        </DialogTitle>
+        <DialogTitle>
+          Deseja deletar todo list  <Text display="inline" color="red.500">{title}</Text>?
+          </DialogTitle>
       </DialogHeader>
       <DialogFooter>
         <DialogActionTrigger asChild>
