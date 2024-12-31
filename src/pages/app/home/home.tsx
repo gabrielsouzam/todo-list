@@ -49,12 +49,22 @@ export function Home() {
     setFilteredTodoLists(filteredList)
   }, [priorityFilter, searchQuery, todoLists])
 
-  function filterUndeletedTask(id: string) {
+  function filterUndeletedTodoList(id: string) {
     const filteredList = filteredTodoLists.filter((todoList) => {
       return todoList.id !== id
     })
 
     setFilteredTodoLists(filteredList)
+  }
+
+  function updateTodoList(updatedTodoList: TodoList) {
+    
+
+    const updatedList = filteredTodoLists.map((todoList) =>
+      todoList.id === updatedTodoList.id ? updatedTodoList : todoList
+    );
+  
+    setFilteredTodoLists(updatedList);
   }
 
   if (loading) {
@@ -121,7 +131,8 @@ export function Home() {
 
         <TodoListCards 
           todoLists={filteredTodoLists} 
-          filterUndeletedTask={filterUndeletedTask} 
+          updateTodoList={updateTodoList}
+          filterUndeletedTodoList={filterUndeletedTodoList} 
         />
       </Box>
     </>

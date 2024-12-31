@@ -1,6 +1,7 @@
 import { taskService } from "@/service/task-service"
 import { Box, IconButton } from "@chakra-ui/react"
 import { Check } from "@phosphor-icons/react"
+import { useState } from "react"
 
 interface CheckButtonProps {
    done: boolean
@@ -9,9 +10,12 @@ interface CheckButtonProps {
 }
 
 export function CheckButton({ done, taskId, onTaskUpdated }: CheckButtonProps) {
+  const [isDone, setIsDone] = useState<boolean>(done)
+
   async function handleCompleteTask() {
     try {
       await taskService.updateStatus(taskId, !done)
+      setIsDone(!done)
       onTaskUpdated()
     } catch (error) {
       console.error("Erro ao marcar a task como concluída:", error)
@@ -28,10 +32,10 @@ export function CheckButton({ done, taskId, onTaskUpdated }: CheckButtonProps) {
       variant="solid"
       size="xs"
       borderRadius="full"
-      bg={done ? "green.500" : "gray.700"}
+      bg={isDone ? "green.500" : "gray.700"}
       color="white"
       _hover={{
-        bg: done ? "green.400" : "gray.400",
+        bg: isDone ? "green.400" : "gray.400",
       }}
       position="relative"
     >
@@ -49,7 +53,7 @@ export function CheckButton({ done, taskId, onTaskUpdated }: CheckButtonProps) {
       >
         <Check />
       </Box>
-      {done ? <Check /> : <></>}
+      {isDone ? <Check /> : <></>}
     </IconButton>
   )
 }

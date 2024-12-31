@@ -3,15 +3,17 @@ import { ProgressBar } from "@/components/ui/progress"
 import { Tag } from "@/components/ui/tag"
 import { Box, Button, Flex, ProgressRoot, Text } from "@chakra-ui/react"
 import { DialogRoot, DialogTrigger } from "@/components/ui/dialog"
-import { Trash } from "@phosphor-icons/react"
+import { Pencil, Trash } from "@phosphor-icons/react"
 import { useNavigate } from "react-router-dom"
 import { DynamicIcon } from "./dynamic-icon"
 import { DeleteTodoListModal } from "./delete-todo-list-modal"
 import { useState } from "react"
+import { UpdateTodoListModal } from "./update-todo-list-modal"
 
 interface TodoListCardProps {
   todoList: TodoList
-  filterUndeletedTask: (id: string) => void
+  filterUndeletedTodoList: (id: string) => void
+  updateTodoList: (todoList: TodoList) => void
 }
 
 function getPriorityColor(priority: "low" | "medium" | "high") {
@@ -41,37 +43,36 @@ function getPriorityText(priority: "low" | "medium" | "high") {
 function getScopeText(scope: "work" | "study" | "personal" | "household" | "social") {
   switch (scope) {
     case "work":
-      return "Trabalho";
+      return "Trabalho"
     case "study":
-      return "Estudo";
+      return "Estudo"
     case "personal":
-      return "Pessoal";
+      return "Pessoal"
     case "household":
-      return "Casa";
+      return "Casa"
     case "social":
-      return "Social";
+      return "Social"
   }
 }
 
 
-export function TodoListCard({ todoList, filterUndeletedTask }: TodoListCardProps) {
+export function TodoListCard({ todoList, filterUndeletedTodoList, updateTodoList }: TodoListCardProps) {
   const navigate = useNavigate()
-  const [onDelete, setOnDelete] = useState<boolean>(false)
+  const [onChangeTodoList, setOnChangeTodoList] = useState<boolean>(false)
 
   const completedPercentage = Math.round(
     (todoList.tasks_done / (todoList.task_count || 1)) * 100
   )
 
   function navigateToTodoList(id: string) {
-    if(!onDelete) {
+    if(!onChangeTodoList) {
       navigate(`/todo-list/${id}`)
     }
-
-    setOnDelete(false)
   }
 
-  function UpdateTasksLists() {
-    filterUndeletedTask(todoList.id)
+  function UpdateUndeletedTodoLists() {
+    filterUndeletedTodoList(todoList.id)
+    setOnChangeTodoList(false)
   }
 
   return (
@@ -88,7 +89,11 @@ export function TodoListCard({ todoList, filterUndeletedTask }: TodoListCardProp
       borderColor={completedPercentage === 100 ? "green.700" : "gray.900"}
       cursor="pointer"
       _hover={{ bg: "gray.900" }}
-      onClick={() => navigateToTodoList(todoList.id)}
+      onClick={(e) => {
+        const target = e.target as HTMLElement
+        if (target.closest("button")) return
+        navigateToTodoList(todoList.id)
+      }}
       position="relative"
     >
       <DynamicIcon icon={todoList.icon} color={todoList.color} size={32} />
@@ -123,11 +128,36 @@ export function TodoListCard({ todoList, filterUndeletedTask }: TodoListCardProp
         </Box>
       </Box>
 
+      <DialogRoot size="lg">
+        <DialogTrigger asChild>
+          <Button
+            onClick={(e) => {
+              setOnChangeTodoList(true)
+              e.stopPropagation()
+            }}
+            _hover={{ color: "gray.500" }}
+            size="sm"
+            variant="ghost"
+            colorScheme="red"
+            position="absolute"
+            top="0.5rem"
+            right="3rem"
+          >
+            <Pencil weight="bold" />
+          </Button>
+        </DialogTrigger>
+        <UpdateTodoListModal
+          todoList={todoList}
+          updateTodoList={updateTodoList}
+          permitNavigateToTasks={() => setOnChangeTodoList(false)}
+        />
+      </DialogRoot>
+
       <DialogRoot>
         <DialogTrigger asChild>
           <Button
             onClick={(e) => {
-              setOnDelete(true)
+              setOnChangeTodoList(true)
               e.stopPropagation()
             }}
             _hover={{ color: "red.500" }}
@@ -144,11 +174,9 @@ export function TodoListCard({ todoList, filterUndeletedTask }: TodoListCardProp
         <DeleteTodoListModal
           id={todoList.id}
           title={todoList.title}
-          updateTodoLists={UpdateTasksLists}
+          updateTodoLists={UpdateUndeletedTodoLists}
         />
       </DialogRoot>
-
-
     </Flex>
   )
 }
