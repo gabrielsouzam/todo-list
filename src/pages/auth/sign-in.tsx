@@ -98,7 +98,7 @@ export function SignIn() {
               </Field>
 
               <Field
-                label="E-mail"
+                label="Senha"
                 invalid={!!errors.password}
                 errorText={errors.password?.message}
                 required 
